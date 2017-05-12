@@ -10,10 +10,20 @@ let lit name fichier =
     while true do
       fichier := (!fichier)^ (input_line (buf) )
     done
-  with End_of_file -> ()  
+  with End_of_file -> ()
 
+let fichiera = ref None
+                    
+let arg_spec =
+  ["-f", Arg.String (fun i -> fichiera := Some i ),""]
+  
 
-let get_formula fichier = 
+let () = Arg.parse arg_spec (fun _ -> ()) "Usage ./closure -f <examplefile>"
+
+       
+let get_formula =
+  
+  let fichier = match !fichiera with None -> assert false | Some(fichier) -> fichier in 
   if Sys.file_exists fichier then
    begin
      let contenu = ref "" in
