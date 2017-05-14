@@ -22,4 +22,4 @@ and print_term = function
   | Id x -> x
           
 let interpPrint a = 
-	print_string (to_string a);print_string "\n"
+	print_string (to_string a)(* ;print_string "\n" *)

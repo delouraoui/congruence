@@ -1,6 +1,36 @@
 open ClAst
+open Cc
 
-
+(*** Termes traitement ***)
+       
+let rec get_cnst_form = function
+  | True           -> [(Id ("True"),Id ("True"))]
+  | False          -> [(Id ("False"),Id ("False"))]
+  | Atom(p)        -> get_cnst_term p
+  | Not(exp)       -> get_cnst_form exp
+  | And(l, r)      -> (get_cnst_form l) @ (get_cnst_form r)
+  | Or(l, r)       -> (get_cnst_form l) @ (get_cnst_form r)
+                                                  
+and get_cnst_term = function
+  | App (a,b) -> (App (a,b),App (a,b))::  (get_cnst_term a) @ (get_cnst_term b)
+  | Eq  (a,b) -> (get_cnst_term a) @ (get_cnst_term b)
+  | Id x ->  [(Id x,Id x)]
+              
+let rec get_eq_form = function
+  | True           -> []
+  | False          -> []
+  | Atom(p)        -> get_eq_term p
+  | Not(exp)       -> get_eq_form exp
+  | And(l, r)      -> (get_eq_form l) @ (get_eq_form r)
+  | Or(l, r)       -> (get_eq_form l) @ (get_eq_form r)
+                                                  
+and get_eq_term = function
+  | App (a,b) -> (get_eq_term a) @ (get_eq_term b)
+  | Eq  (a,b) as eq -> [eq]
+  | Id x -> []
+       
+(*** Administrative part ***)
+       
 (* Fonction permetant de récupérer l'ast généré après parsing *)
 let parse (s : string) : clForm = ClParser.main ClLexer.token (Lexing.from_string s)
 
@@ -19,17 +49,23 @@ let arg_spec =
   
 
 let () = Arg.parse arg_spec (fun _ -> ()) "Usage ./closure -f <examplefile>"
+(*** Administrative part ***)
 
-       
-let get_formula =
-  
+                   
+let get_formula =  
   let fichier = match !fichiera with None -> assert false | Some(fichier) -> fichier in 
   if Sys.file_exists fichier then
    begin
      let contenu = ref "" in
      let _ = lit fichier contenu in
      let ast =  (parse (!contenu)) in
-     ClPrinter.interpPrint ast;
+     let closure = Cc.congurence (get_cnst_form ast) (get_eq_form ast) in
+     List.iter (fun (a,eqlist) ->
+         ClPrinter.interpPrint (Atom a);
+         Printf.printf " : equality -->";
+         List.iter (fun (Equal(a',b')) ->
+             ClPrinter.interpPrint (Atom (Eq(a',b'))); Printf.printf " ; " ) eqlist; Printf.printf " \n" ) closure;
+      ClPrinter.interpPrint ast; Printf.printf " \n";
      ast
    end
   else(

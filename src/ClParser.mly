@@ -7,8 +7,8 @@
 %token <string> BID
 %token EOF
 
-%left AND OR EQ
-%nonassoc NOT
+%left AND OR
+%nonassoc NOT 
 
 %start main             /* the entry point */
 %type <ClAst.clForm> main
@@ -23,10 +23,17 @@ clForm:
   | NOT clForm                          { ClAst.Not ($2) }
   | clForm AND clForm                   { ClAst.And ($1, $3) }
   | clForm OR clForm                    { ClAst.Or ($1,$3) }
-  | LPAREN clForm RPAREN                { $2 }
+  (* | LPAREN clForm RPAREN                { $2 } *)
+  | eqterm                              { ClAst.Atom($1) }
   | term                                { ClAst.Atom($1) }
-  
-term:
-  | BID  { ClAst.Id ($1) }
-  | term EQ term  { ClAst.Eq ($1,$3) }
-  | LPAREN term term RPAREN { ClAst.App ($2,$3) }
+
+term:                               
+  | id { $1 }
+  | term term  { ClAst.App ($1,$2) } 
+  | LPAREN term RPAREN  { $2 }
+        
+id:
+  | BID       { ClAst.Id ($1) }
+              
+eqterm:
+  | term EQ term  { ClAst.Eq ($1,$3) }    
