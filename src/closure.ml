@@ -12,7 +12,7 @@ let rec get_cnst_form = function
   | Or(l, r)       -> (get_cnst_form l) @ (get_cnst_form r)
                                                   
 and get_cnst_term = function
-  | App (a,b) -> (App (a,b),App (a,b))::  (get_cnst_term a) @ (get_cnst_term b)
+  | App (a,b) -> (App (a,b),App (a,b)) ::  (get_cnst_term a) @ (get_cnst_term b)
   | Eq  (a,b) -> (get_cnst_term a) @ (get_cnst_term b)
   | Id x ->  [(Id x,Id x)]
               
@@ -61,10 +61,17 @@ let get_formula =
      let ast =  (parse (!contenu)) in
      let closure = Cc.congurence (get_cnst_form ast) (get_eq_form ast) in
      List.iter (fun (a,eqlist) ->
-         ClPrinter.interpPrint (Atom a);
-         Printf.printf " : equality -->";
-         List.iter (fun (Equal(a',b')) ->
-             ClPrinter.interpPrint (Atom (Eq(a',b'))); Printf.printf " ; " ) eqlist; Printf.printf " \n" ) closure;
+           ClPrinter.interpPrint (Atom a);
+           Printf.printf " : equality --> ";
+           (* switch *)
+           List.iter (fun t ->
+               ClPrinter.interpPrint (Atom t); Printf.printf " , " )
+                     eqlist; Printf.printf " ;\n"
+           ) closure;
+     
+             (* List.iter (fun (Equal(a',b')) -> *)
+             (*     ClPrinter.interpPrint (Atom (Eq(a',b'))); Printf.printf " ; " ) eqlist; *)
+             (* Printf.printf " \n" ) closure; *)
       ClPrinter.interpPrint ast; Printf.printf " \n";
      ast
    end
@@ -73,3 +80,4 @@ let get_formula =
     exit(1)
   )
 
+  

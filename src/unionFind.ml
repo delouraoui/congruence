@@ -2,10 +2,10 @@ open ClAst
        
 type eq =
   Equal of term * term
+let cmp x y = if Cc.eq_term x y then 0 else 1
+module M = Map.Make (struct type t = term let compare = cmp end)  
 
-module M = Map.Make (struct type t = int let compare = compare end)  
-
-type t = int M.t
+type t = term M.t
 
 let not_eq u v = u <> v
              
@@ -22,3 +22,12 @@ let union m u v =
   let rv = find m v in
   if not_eq ru rv then M.add ru rv m
   else m 
+
+
+let rec merge m u v =
+  if Cc.eq_term (find m u) (find m v) then m
+  else 
+    let un = union m u v in
+    assert false
+let congrClosure = assert false
+  
