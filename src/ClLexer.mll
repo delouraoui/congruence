@@ -38,6 +38,7 @@ rule token = parse
   | "and"           { AND }
   | "or"            { OR }
   | "="             { EQ }
+  | ","             { COMMA }
   | "not"           { NOT }
   | "("             { LPAREN }
   | ")"             { RPAREN }

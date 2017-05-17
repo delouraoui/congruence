@@ -9,11 +9,11 @@ type class_lst = (term * term list) list
 type lookup_tbl = (term * term) list
 type use_lst = (term * eq list) list
 
-let rec eq_term a b =
-  match a, b with
-  | Id a', Id b' -> String.equal a' b'
-  | App(a,b), App(a',b') ->
-     eq_term a a' && eq_term b' b'
+let rec eq_term e1 e2 =
+  match e1, e2 with
+  | Const a',  Const b' -> String.equal a' b'
+  | App( (Id a) ,b), App(Id(a'),b') ->
+     String.equal a' a' && (List.for_all2 eq_term b b')
   | Eq(a,b),Eq(a',b') -> 
      eq_term a a' && eq_term b b'
   | _,_ -> false
@@ -49,8 +49,8 @@ let rec set_reptbl c b = function
                 
 let rec set_looktbl c d e' : lookup_tbl -> lookup_tbl = function
   | [] -> []
-  | (App(c',d'),b')::l when (eq_term c c') && (eq_term d d') ->
-     (App(c',d'),e')::(set_looktbl c d e' l)
+  | (App((Id c'),d'),b')::l when (String.equal c c') && (List.for_all2 eq_term d d') ->
+     (App((Id c'),d'),e')::(set_looktbl c d e' l)
   | (c',b')::l ->
      (c',b')::(set_looktbl c d e' l)
                 
@@ -136,9 +136,9 @@ let addulst a eq ulst =
                                 
 let addlklst a b c lookuptbl = 
   try
-    let _ = assoc (App(a,b)) lookuptbl in
+    let _ = assoc (CApp(a,b)) lookuptbl in
     set_looktbl a b c lookuptbl
-  with Not_found -> (App(a,b),c)::lookuptbl      
+  with Not_found -> (CApp(a,b),c)::lookuptbl      
                
 let rec init pending1 pending2 ulst lookuptbl = function
   | [] -> (List.rev pending2) @(List.rev pending1),ulst,lookuptbl
@@ -181,8 +181,8 @@ let rec elim_bdl'  = function
   | [] -> []
   | (a,b)::q ->
      let l = elim_bdl_s b in
-     (a,l)::elim_bdl' q
-                         
+     (a,l)::elim_bdl' q 
+                        
 let rec elim_bdl_eq = function
   | [] -> []
   | a::q ->

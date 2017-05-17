@@ -7,7 +7,9 @@ type clForm =
   | And of clForm * clForm 
   | Or of clForm * clForm
 
- and term =
+           
+and term =
    | Id of string
-   | Eq of term * term     
-   | App of term * term
+   | Eq of term  * term
+   | App of term  * (term list)
+
