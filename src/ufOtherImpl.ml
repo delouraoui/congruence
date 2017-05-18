@@ -30,7 +30,7 @@ let rec make_node pred = function
           
 let rec find i lstOfNode =
   let n = List.nth lstOfNode i in
-  if (find i lstOfNode) = i then i else (find n.find lstOfNode)
+  if n.find = i then i else (find n.find lstOfNode)
 
 let union i1 i2 lstOfNode =
   let n1 = List.nth lstOfNode i1 in
@@ -50,7 +50,6 @@ let congruent i1 i2 lstOfNode =
       List.for_all2 (fun arg1 arg2 -> (find arg1 lstOfNode) = (find arg2 lstOfNode) ) n1.args n2.args
 
 let rec merge i1 i2 lstOfNode =
-  Printf.printf "salut \n";
   if find i1 lstOfNode <> find i2 lstOfNode then begin
       let pi1 = ccpar i1 lstOfNode in 
       let pi2 = ccpar i2 lstOfNode in 
@@ -60,7 +59,7 @@ let rec merge i1 i2 lstOfNode =
           List.iter (
               fun  t2 ->
               if (find t1 lstOfNode) <> (find t2 lstOfNode) && congruent t1 t2 lstOfNode then
-                merge i1 i2 lstOfNode
+                merge t1 t2 lstOfNode
             ) (IdSet.elements pi2)
         ) (IdSet.elements pi1)
     end
@@ -93,5 +92,4 @@ let decision sf eqlst neqlst =
   let eqlst = List.map (fun (si,ti) -> (assoc si index,assoc ti index) ) eqlst in
   let neqlst = List.map (fun (si,ti) -> (assoc si index,assoc ti index) ) neqlst in
   List.iter (fun (si,ti) -> merge si ti lstOfNode ) eqlst;
-  (* (List.exists (fun (si,ti) -> (find si lstOfNode)  = (find ti lstOfNode) ) neqlst) *)
-    assert false
+  (List.for_all (fun (si,ti) -> (find si lstOfNode) <> (find ti lstOfNode) ) neqlst)
