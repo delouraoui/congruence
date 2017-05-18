@@ -12,12 +12,16 @@ let rec to_string exp =
     | True           -> "⊤"
     | False          -> "⊥"
     | Atom(p)        -> print_term p
-    | Not(exp)       -> "¬" ^ (print_paren exp)
+    | Not(exp)       -> "¬ (" ^ (print_paren exp) ^ ")"
     | And(l, r)      -> (print_paren l) ^ " ∧ " ^ (print_paren r)
     | Or(l, r)       -> (print_paren l) ^ " ∨ " ^ (print_paren r)
 
 and print_term = function
-  | App (a,b) -> "(" ^ (print_term a) ^" "^ (List.fold_right (fun y str -> str^(print_term y) ) b "")^ ")"
+  | App (a,b) -> (print_term a) ^"("^ (List.fold_left (fun str y ->
+                                                 if String.equal str "" then 
+                                                   str^(print_term y)
+                                                 else str^","^(print_term y)
+                                               ) "" b )^ ")"
   | Eq  (a,b) -> (print_term a) ^" = "^ (print_term b)
   | Id x -> x
           

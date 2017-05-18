@@ -69,25 +69,23 @@ let get_formula =
      let contenu = ref "" in
      let _ = lit fichier contenu in
      let ast =  (parse (!contenu)) in
-     let closure =
+     let closure1 =
        UnionFind.congrClosure
          (get_eq_form ast)
          (get_cnst_form ast)
          (get_neq_form ast) in
-     if closure then Printf.printf "SAT\n"
-     else Printf.printf "UNSAT\n";
-     (* List.iter (fun (a,eqlist) -> *)
-     (*       ClPrinter.interpPrint (Atom a); *)
-     (*       Printf.printf " : equality --> "; *)
-     (*       (\* switch *\) *)
-     (*       List.iter (fun t -> *)
-     (*           ClPrinter.interpPrint (Atom t); Printf.printf " , " ) *)
-     (*                 eqlist; Printf.printf " ;\n" *)
-     (*       ) closure; *)
+     let closure2 =
+       UfOtherImpl.decision
+       (get_cnst_form ast)
+       (get_eq_form ast)
+       (get_neq_form ast) in
      
-             (* List.iter (fun (Equal(a',b')) -> *)
-             (*     ClPrinter.interpPrint (Atom (Eq(a',b'))); Printf.printf " ; " ) eqlist; *)
-             (* Printf.printf " \n" ) closure; *)
+     Printf.printf "First Implementation \n";
+     if closure1 then Printf.printf "SAT\n"
+     else Printf.printf "UNSAT\n";
+     Printf.printf "Seconde Implementation \n";
+     if closure2 then Printf.printf "SAT\n"
+     else Printf.printf "UNSAT\n";
      ClPrinter.interpPrint ast; Printf.printf " \n";
      ast
    end
