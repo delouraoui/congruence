@@ -58,6 +58,8 @@ let rec elim_bdl_paires = function
      if mem_paires (a,b) q then 
        elim_bdl_paires q
      else (a,b)::elim_bdl_paires q
+
+    
 let inter l1 l2 =
   (List.filter (fun e2 -> mem' e2 l2) l1)@(List.filter (fun e2 -> mem' e2 l1) l2)
                 
