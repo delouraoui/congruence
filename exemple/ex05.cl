@@ -1,0 +1,1 @@
+b = a and b = c and c = d and not (a = d)

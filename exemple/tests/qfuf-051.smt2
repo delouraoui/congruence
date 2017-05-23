@@ -1,0 +1,16 @@
+(set-logic QF_UF)
+(set-info :status sat)
+(set-info :smt-lib-version 2.0)
+(set-info :category "unknown")
+(declare-sort U 0)
+(declare-sort I 0)
+(declare-fun op (I I) I)
+(declare-fun e1 () I)
+(declare-fun e0 () I)
+(assert
+  (and
+    (not (= e0 e1))
+    (= (op e0 e0) e1)
+    (= e0 (op e0 e1))))
+(check-sat)
+(exit)

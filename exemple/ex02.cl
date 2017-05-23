@@ -1,0 +1,1 @@
+f(x) = f(y) and not ( x = y )

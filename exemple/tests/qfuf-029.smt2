@@ -1,0 +1,10 @@
+(set-logic QF_UF)
+(set-info :status unsat)
+(declare-sort U 0)
+(declare-fun c11 () U)
+(declare-fun c_0 () U)
+(declare-fun p4 ( U) Bool)
+(assert 
+ (and (not (p4 c_0)) (p4 c11) (= c_0 c11)))
+(check-sat)
+(exit)

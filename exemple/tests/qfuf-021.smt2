@@ -1,0 +1,17 @@
+(set-logic QF_UF)
+(set-info :status unsat)
+(set-info :smt-lib-version 2.0)
+(set-info :category "crafted")
+
+(declare-sort U 0)
+(declare-fun p (U) Bool)
+(declare-fun a () U)
+(declare-fun b () U)
+(declare-fun c () U)
+(assert (! (= a c) :named input1))
+(assert (! (= c b) :named input2))
+(assert (! (p a) :named input3))
+(assert (! (not (p b)) :named input4))
+(check-sat)
+(exit)
+

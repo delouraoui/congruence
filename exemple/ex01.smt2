@@ -1,0 +1,7 @@
+(set-logic AUFLIRA)
+(declare-fun a () Int)
+(declare-fun f (Int) Int)
+(declare-fun g (Int) Int)
+(assert (and (= (f(f(f a))) a) (= (f (f (f (f (f a))))) a) (not (= (g  a) a))))
+(check-sat)
+(exit)

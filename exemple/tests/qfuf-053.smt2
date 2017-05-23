@@ -1,0 +1,6 @@
+(set-logic QF_UF)
+(set-info :status unsat)
+(declare-fun b () Bool)
+(assert (let ((a  (not b))) (and a b) ) )
+(check-sat)
+(exit)

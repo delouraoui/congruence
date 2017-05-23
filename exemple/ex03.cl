@@ -1,0 +1,1 @@
+f(a,b) = a and not ( f(f(a,b),b) = a ) 

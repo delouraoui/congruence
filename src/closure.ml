@@ -2,7 +2,7 @@ open ClAst
 
 
 (*** Termes traitement ***)
-       
+   
 let rec get_cnst_form = function
   | True           -> [(Id ("True"))]
   | False          -> [(Id ("False"))]
@@ -10,12 +10,12 @@ let rec get_cnst_form = function
   | Not(exp)       -> get_cnst_form exp
   | And(l, r)      -> (get_cnst_form l) @ (get_cnst_form r)
   | Or(l, r)       -> (get_cnst_form l) @ (get_cnst_form r)
-                                                  
+                    
 and get_cnst_term = function
   | App (a,b) -> (App (a,b)) ::  (* (get_cnst_term a) @ *) (List.flatten (List.map get_cnst_term b))
   | Eq  (a,b) -> (get_cnst_term a) @ (get_cnst_term b)
   | Id x ->  [(Id x)]
-              
+           
 let rec get_eq_form = function
   | True           -> []
   | False          -> []
@@ -23,12 +23,12 @@ let rec get_eq_form = function
   | Not(exp)       -> [](* get_eq_form exp *)
   | And(l, r)      -> (get_eq_form l) @ (get_eq_form r)
   | Or(l, r)       -> (get_eq_form l) @ (get_eq_form r)
-                                                  
+                    
 and get_eq_term = function
   | Eq  (a,b)  -> [(a,b)]
   | _ -> []
 
-          
+       
 let rec get_neq_form = function
   | True               -> []
   | False              -> []
@@ -37,7 +37,7 @@ let rec get_neq_form = function
   | Or(l, r)           -> (get_neq_form l) @ (get_neq_form r)
   | _ -> []                                                
 
-          
+       
 (*** Administrative part ***)
        
 (* Fonction permetant de récupérer l'ast généré après parsing *)
@@ -52,42 +52,68 @@ let lit name fichier =
   with End_of_file -> ()
 
 let fichiera = ref None
-                    
+let smt = ref false                    
 let arg_spec =
-  ["-f", Arg.String (fun i -> fichiera := Some i ),""]
+  ["-f", Arg.String (fun i -> fichiera := Some i ),"";
+   "-smt2", Arg.String (fun i -> smt := true; fichiera := Some i ),""]
   
 
 let () = Arg.parse arg_spec (fun _ -> ()) "Usage ./closure -f <examplefile>"
 (*** Administrative part ***)
 
-                   
+       
 let get_formula =  
-  let fichier = match !fichiera with None -> assert false | Some(fichier) -> fichier in 
+  let fichier = match !fichiera with None ->assert false | Some(fichier) -> fichier in 
   if Sys.file_exists fichier then
-   begin
-     let contenu = ref "" in
-     let _ = lit fichier contenu in
-     let ast =  (parse (!contenu)) in
-     (* let closure1 = *)
-     (*   UnionFind.congrClosure *)
-     (*     (get_eq_form ast) *)
-     (*     (get_cnst_form ast) *)
-     (*     (get_neq_form ast) in *)
-     let closure2 =
-       UfOtherImpl.decision
-       (get_cnst_form ast)
-       (get_eq_form ast)
-       (get_neq_form ast) in
-     
-     (* Printf.printf "First Implementation \n"; *)
-     (* if closure1 then Printf.printf "SAT\n" *)
-     (* else Printf.printf "UNSAT\n"; *)
-     Printf.printf "Seconde Implementation \n";
-     if closure2 then Printf.printf "SAT\n"
-     else Printf.printf "UNSAT\n";
-     ClPrinter.interpPrint ast; Printf.printf " \n";
-     ast
-   end
+    begin
+      if !smt then begin
+          let ast = SmtToSimpl.parsing fichier in
+          let fstTerme,indice = SmtToSimpl.find_first 0 ast in
+        let ast = SmtToSimpl.translate_st fstTerme indice 0 ast in
+        Printf.printf "\nFormula : ";
+        ClPrinter.interpPrint ast; Printf.printf " \n";                         
+         let closure2 =
+            UfOtherImpl.decision
+              (get_cnst_form ast)
+              (get_eq_form ast)
+              (get_neq_form ast) in
+           (* let closure1 = *)
+          (*   UnionFind.congrClosure *)
+          (*     (get_eq_form ast) *)
+          (*     (get_cnst_form ast) *)
+          (*     (get_neq_form ast) in *)
+          (* Printf.printf "First Implementation \n"; *)
+          (* if closure1 then Printf.printf "SAT\n" *)
+          (* else Printf.printf "UNSAT\n"; *)
+          (* Printf.printf "Seconde Implementation \n"; *)
+          if closure2 then Printf.printf "SAT\n"
+          else Printf.printf "UNSAT\n";
+          ClPrinter.interpPrint ast; Printf.printf " \n";
+        end 
+      else begin 
+      let contenu = ref "" in
+          let _ = lit fichier contenu in
+          let ast =  (parse (!contenu)) in
+          (* let closure1 = *)
+          (*   UnionFind.congrClosure *)
+          (*     (get_eq_form ast) *)
+          (*     (get_cnst_form ast) *)
+          (*     (get_neq_form ast) in *)
+          let closure2 =
+            UfOtherImpl.decision
+              (get_cnst_form ast)
+              (get_eq_form ast)
+              (get_neq_form ast) in
+          
+          (* Printf.printf "First Implementation \n"; *)
+          (* if closure1 then Printf.printf "SAT\n" *)
+          (* else Printf.printf "UNSAT\n"; *)
+          (* Printf.printf "Seconde Implementation \n"; *)
+          if closure2 then Printf.printf "SAT\n"
+          else Printf.printf "UNSAT\n";
+          ClPrinter.interpPrint ast; Printf.printf " \n";
+        end
+    end
   else(
     print_string "le fichier n existe pas\n";
     exit(1)
