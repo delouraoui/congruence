@@ -1,0 +1,3 @@
+PKG dolmen
+B _build/**
+B _build/src

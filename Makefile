@@ -17,10 +17,10 @@ native: $(NATIVETARGETS)
 byte: $(BYTETARGETS)
 
 $(NATIVETARGETS): %.native : %.ml
-	$(OCAMLBUILD) -use-ocamlfind -I $(SRCDIR) $@
+	$(OCAMLBUILD) -use-ocamlfind -pkg dolmen -I $(SRCDIR) $@
 
 $(BYTETARGETS): %.byte : %.ml
-	$(OCAMLBUILD) -use-ocamlfind -use-menhir -I (SRCDIR) $@
+	$(OCAMLBUILD) -use-ocamlfind -use-menhir -pkg dolmen -I (SRCDIR) $@
 clean:
 	$(OCAMLBUILD) -clean
 
