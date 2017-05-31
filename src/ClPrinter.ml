@@ -17,6 +17,13 @@ let rec to_string exp =
     | Or(l, r)       -> (print_paren l) ^ " ∨ " ^ (print_paren r)
 
 and print_term = function
+  | PApp (applied,tot,a,b) ->
+     (print_term a) ^"^["^(string_of_int applied)^"/"^(string_of_int tot)^"] ("^
+       (List.fold_left (fun str y ->
+            if String.equal str "" then 
+              str^(print_term y)
+            else str^","^(print_term y)
+          ) "" b )^ ")"
   | App (a,b) -> (print_term a) ^"("^ (List.fold_left (fun str y ->
                                                  if String.equal str "" then 
                                                    str^(print_term y)

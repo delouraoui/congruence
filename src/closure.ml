@@ -12,6 +12,8 @@ let rec get_cnst_form = function
   | Or(l, r)       -> (get_cnst_form l) @ (get_cnst_form r)
                     
 and get_cnst_term = function
+  | PApp(applied,tot,a,b) ->
+     PApp(applied,tot,a,b) ::  (* (get_cnst_term a) @ *) (List.flatten (List.map get_cnst_term b))
   | App (a,b) -> (App (a,b)) ::  (* (get_cnst_term a) @ *) (List.flatten (List.map get_cnst_term b))
   | Eq  (a,b) -> (get_cnst_term a) @ (get_cnst_term b)
   | Id x ->  [(Id x)]
@@ -71,12 +73,17 @@ let get_formula =
           let fstTerme,indice = SmtToSimpl.find_first 0 ast in
         let ast = SmtToSimpl.translate_st fstTerme indice 0 ast in
         Printf.printf "\nFormula : ";
-        ClPrinter.interpPrint ast; Printf.printf " \n";                         
-         let closure2 =
-            UfOtherImpl.decision
+        ClPrinter.interpPrint ast; Printf.printf " \n";
+        let closure2 =
+           HoCongr.decision
               (get_cnst_form ast)
               (get_eq_form ast)
               (get_neq_form ast) in
+         (* let closure2 = *)
+         (*    UfOtherImpl.decision *)
+         (*      (get_cnst_form ast) *)
+         (*      (get_eq_form ast) *)
+         (*      (get_neq_form ast) in *)
            (* let closure1 = *)
           (*   UnionFind.congrClosure *)
           (*     (get_eq_form ast) *)
@@ -100,10 +107,15 @@ let get_formula =
           (*     (get_cnst_form ast) *)
           (*     (get_neq_form ast) in *)
           let closure2 =
-            UfOtherImpl.decision
+           HoCongr.decision
               (get_cnst_form ast)
               (get_eq_form ast)
               (get_neq_form ast) in
+          (* let closure2 = *)
+          (*   UfOtherImpl.decision *)
+          (*     (get_cnst_form ast) *)
+          (*     (get_eq_form ast) *)
+          (*     (get_neq_form ast) in *)
           
           (* Printf.printf "First Implementation \n"; *)
           (* if closure1 then Printf.printf "SAT\n" *)

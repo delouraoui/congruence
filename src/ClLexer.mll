@@ -37,12 +37,16 @@ rule token = parse
   | "true"          { TRUE }
   | "and"           { AND }
   | "or"            { OR }
+  | ":"             { COLON }
   | "="             { EQ }
   | ","             { COMMA }
   | "not"           { NOT }
   | "("             { LPAREN }
   | ")"             { RPAREN }
+  | "["             { LBRAQ }
+  | "]"             { RBRAQ }
   | basic_identifier as s { BID (s) }
+  | digit as i      { NUM ((int_of_char(i))-48) }
   | eof             { EOF }
 
   (** Lexing error. *)

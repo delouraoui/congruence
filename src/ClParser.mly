@@ -1,10 +1,11 @@
 %token AND
 %token TRUE
 %token FALSE
-%token NOT
-%token OR EQ COMMA
-%token LPAREN RPAREN
+%token NOT COLON
+%token OR EQ COMMA 
+%token LPAREN RPAREN LBRAQ RBRAQ
 %token <string> BID
+%token <int> NUM
 %token EOF
 
 %left AND OR
@@ -15,6 +16,7 @@
 main:
     clForm EOF              { $1 }
 ;
+
 
 clForm:
   | FALSE                               { ClAst.False }
@@ -27,13 +29,14 @@ clForm:
   
 term:
   | id { $1 }
-  (* | AT term term { ClAst.BApp ($2,$3) } *)
   | term  LPAREN separated_list (COMMA, term) RPAREN { ClAst.App ($1,$3) }
+  | term  LBRAQ NUM COLON NUM RBRAQ LPAREN separated_list (COMMA, term) RPAREN
+          { ClAst.PApp ($3,$5,$1,$8) }
   | LPAREN term RPAREN  { $2 }
 
   
 id:
   | BID       { ClAst.Id($1) }
-           
+          
 eqterm:
   | term EQ term  { ClAst.Eq ($1,$3) }

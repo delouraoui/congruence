@@ -12,4 +12,4 @@ and term =
    | Id of string
    | Eq of term  * term
    | App of term  * (term list)
-
+   | PApp of int * int * term  * (term list)
